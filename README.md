@@ -1,5 +1,4 @@
 # 🎫 Taskio Pro
-
 ![Status](https://img.shields.io/badge/status-production_ready-green.svg)
 ![Tech](https://img.shields.io/badge/stack-LangChain_RAG-orange.svg)
 
@@ -10,7 +9,6 @@ Taskio Pro is a full-stack demonstration of modern AI engineering. It uses **Ret
 ---
 
 ## 🏗️ Architecture
-
 ```mermaid
 graph TD
     User[Frontend Next.js] --> API[Backend FastAPI]
@@ -24,6 +22,7 @@ graph TD
       DB
       Redis[Redis Cache]
     end
+```
 
 *(Note: If Mermaid is not supported in your viewer, the flow is: Frontend → FastAPI → LangChain Agent → (ChromaDB + PostgreSQL + Redis) → Gemini LLM)*
 
@@ -47,7 +46,6 @@ graph TD
 ## 📦 Quick Start
 
 **Prerequisites:** Docker & [Google Gemini API Key](https://makersuite.google.com/app/apikey).
-
 ```bash
 # 1. Clone & Configure
 git clone <repo-url>
@@ -84,7 +82,6 @@ POST /api/tickets
 ```
 
 ## 📂 Project Structure
-
 ```text
 taskio-pro/
 ├── backend/
@@ -105,4 +102,5 @@ taskio-pro/
 | **Accuracy** | ~87% (w/ RAG) |
 
 ---
+
 *Built for portfolio demonstration purposes.*
