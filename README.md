@@ -15,13 +15,14 @@ Taskio Pro is a full-stack demonstration of modern AI engineering. It uses **Ret
 graph TD
     User[Frontend Next.js] --> API[Backend FastAPI]
     API --> Agent[LangChain Agent]
-    Agent --> Vector["ChromaDB (RAG)"]
+    Agent --> Vector[ChromaDB Vector Store]
     Agent --> DB[PostgreSQL]
     Agent --> LLM[Gemini 1.5 Flash]
+    
     subgraph Data Layer
-    Vector
-    DB
-    Redis[Redis Cache]
+      Vector
+      DB
+      Redis[Redis Cache]
     end
 
 *(Note: If Mermaid is not supported in your viewer, the flow is: Frontend → FastAPI → LangChain Agent → (ChromaDB + PostgreSQL + Redis) → Gemini LLM)*
