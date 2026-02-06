@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  # PostgreSQL - Relational Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: taskio-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-taskio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-taskio_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-taskio_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskio"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis - Caching Layer
+  redis:
+    image: redis:7-alpine
+    container_name: taskio-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ChromaDB - Vector Database (Open-source Pinecone alternative)
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: taskio-chromadb
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+
+  # FastAPI Backend with LangChain
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: taskio-backend
+    restart: unless-stopped
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-taskio}:${POSTGRES_PASSWORD:-taskio_secret}@postgres:5432/${POSTGRES_DB:-taskio_db}
+      - REDIS_URL=redis://redis:6379
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      chromadb:
+        condition: service_started
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: taskio-frontend
+    restart: unless-stopped
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  redis_data:
+  chroma_data:
+
+networks:
+  default:
+    name: taskio-network
