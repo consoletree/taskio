@@ -48,7 +48,7 @@ graph TD
 **Prerequisites:** Docker & [Google Gemini API Key](https://makersuite.google.com/app/apikey).
 ```bash
 # 1. Clone & Configure
-git clone <repo-url>
+git clone https://www.github.com/consoletree/taskio
 cd taskio-pro
 cp .env.example .env  # Add your GOOGLE_API_KEY in .env
 
